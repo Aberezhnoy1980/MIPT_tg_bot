@@ -1,0 +1,7 @@
+aiogram
+APScheduler
+python-decouple
+requests
+asyncio
+pydantic-settings
+yfinance
