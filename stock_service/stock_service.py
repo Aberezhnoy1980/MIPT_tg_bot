@@ -58,3 +58,16 @@ def get_user_stocks(user_id):
         stock = Stock(user_id, stock_id, quantity, unit_price, purchase_date)
         stocks.append(stock)
     return stocks
+
+
+async def calc_portfolio_diff(user_id):
+    user_stocks = get_user_stocks(user_id)
+    origin_portfolio_price = 0
+    current_portfolio_price = 0
+    for stock in user_stocks:
+        current_price = await get_stock_price_ru(stock.stock_id)
+        origin_stock_price = int(stock.quantity) * float(stock.unit_price)
+        current_stock_price = int(stock.quantity) * float(current_price[0])
+        origin_portfolio_price += origin_stock_price
+        current_portfolio_price += current_stock_price
+    return current_portfolio_price, origin_portfolio_price

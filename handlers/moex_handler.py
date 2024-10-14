@@ -1,15 +1,19 @@
 from datetime import datetime
+import logging
 
 from aiogram import Router, F
 from aiogram.filters import Command
+from aiogram.types import CallbackQuery
 from aiogram.filters.state import StatesGroup, State, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
+from keyboards.all_kb import stock_services_kb
 from stock_service.stock import Stock
 from stock_service.stock_service import check_stock_existence, get_stock_price_ru, get_stock_price_world, add_stock, \
-    get_user_stocks
+    calc_portfolio_diff
 
+logger = logging.getLogger(__name__)
 stock_router = Router()
 
 
@@ -23,10 +27,26 @@ class AddStockStates(StatesGroup):
     StockQuantity = State()
 
 
+@stock_router.callback_query(F.data == "📈Фондовый рынок")
+async def cmd_stock_services_list(callback: CallbackQuery):
+    await callback.message.answer(
+        'Выберите операцию с ценными бумагами MOEX: узнать текщую рыночную стоимость, добавить бумагу в портфель, '
+        'посчитать текущую доходность своего инвестиционного портфеля',
+        reply_markup=stock_services_kb().as_markup())
+    await callback.answer()
+
+
 @stock_router.message(Command('checkStock'))
 async def check_stock_start(message: Message, state: FSMContext):
     await message.reply('Введите идентификатор ценной бумаги')
     await state.set_state(CheckStockStates.StockID)
+
+
+@stock_router.callback_query(F.data == "/checkStock")
+async def check_stock_start(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer('Введите идентификатор ценной бумаги')
+    await state.set_state(CheckStockStates.StockID)
+    await callback.answer()
 
 
 @stock_router.message(StateFilter(CheckStockStates.StockID))
@@ -56,10 +76,17 @@ async def check_stock_id(message: Message, state: FSMContext):
 
 
 @stock_router.message(Command('addStock'))
-async def check_stock_start(message: Message, state: FSMContext):
+async def add_stock_start(message: Message, state: FSMContext):
     await message.reply('Преступим к добавлению ценной бумаги')
     await message.answer('Введите идентификатор приобретенного инструмента')
     await state.set_state(AddStockStates.StockID)
+
+
+@stock_router.callback_query(F.data == "/addStock")
+async def add_stock_start(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer('Введите идентификатор приобретенного инструмента')
+    await state.set_state(AddStockStates.StockID)
+    await callback.answer()
 
 
 @stock_router.message(StateFilter(AddStockStates.StockID))
@@ -92,10 +119,10 @@ async def add_stock_quantity(message: Message, state: FSMContext):
             data['StockPrice'] = message.text.replace(',', '.')
             await state.set_data(data)
             await state.set_state(AddStockStates.StockQuantity)
-        except:
+        except Exception as e:
+            logger.info(e)
             await message.reply('Вы некорректно указали стоимость одной ценной бумаги.')
             await message.answer('Введите стоимость приобретения в числовом формате или введите /stop для отмены"')
-
     else:
         await state.clear()
         await message.reply('Добавление информации о приобретенной ценной бумаге отменено')
@@ -123,25 +150,42 @@ async def add_stock_finish(message: Message, state: FSMContext):
             await state.clear()
             await message.answer('Информация о приобретенной ценной бумаге успешно сохранена!')
         except Exception as e:
+            logger.info(e)
             await message.reply('Вы некорректно указали количество приобретенных единиц ценной бумаги.')
             await message.answer('Введите количество в виде целого числа или введите /stop для отмены"')
-
     else:
         await state.clear()
         await message.reply('Добавление информации о приобретенной ценной бумаге отменено')
 
 
+@stock_router.callback_query(F.data == "checkPortfolioSummary")
+async def check_portfolio(callback: CallbackQuery):
+    current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(callback.from_user.id)
+    if current_portfolio_price < origin_portfolio_price:
+        absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f}</b>'
+    else:
+        absolute_profitability = f'Прибыль: 📈<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f}</b>'
+    await callback.message.answer(f'Инвестиционный портфель:\n'
+                                  f'Номинальная стоимость: <b>{origin_portfolio_price:,.2f} RUB</b>\n'
+                                  f'Текущая стоимость: <b>{current_portfolio_price:,.2f} RUB</b>\n'
+                                  f'{absolute_profitability} '
+                                  f'{relative_profitability} %')
+    await callback.answer()
+
+
 @stock_router.message(F.text == '/checkPortfolioSummary')
 async def check_portfolio(message: Message):
-    user_stocks = get_user_stocks(message.from_user.id)
-    origin_portfolio_price = 0
-    current_portfolio_price = 0
-    for stock in user_stocks:
-        current_price = await get_stock_price_ru(stock.stock_id)
-        origin_stock_price = int(stock.quantity) * float(stock.unit_price)
-        current_stock_price = int(stock.quantity) * float(current_price[0])
-        origin_portfolio_price += origin_stock_price
-        current_portfolio_price += current_stock_price
-    await message.answer(f'Номинальная стоимость портфеля: {origin_portfolio_price:,.2f} RUB\n'
-                         f'Текущая стоимость портфеля: {current_portfolio_price:,.2f} RUB\n'
-                         f'Прибыль: <b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>')
+    current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(message.from_user.id)
+    if current_portfolio_price < origin_portfolio_price:
+        absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1):,.2f}</b>'
+    else:
+        absolute_profitability = f'Прибыль: 📈<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1):,.2f}</b>'
+    await message.answer(f'Инвестиционный портфель:\n'
+                         f'Номинальная стоимость: <b>{origin_portfolio_price:,.2f} RUB</b>\n'
+                         f'Текущая стоимость: <b>{current_portfolio_price:,.2f} RUB</b>\n'
+                         f'{absolute_profitability} '
+                         f'{relative_profitability} %')
