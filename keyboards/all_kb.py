@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 def main_kb(user_telegram_id: int):
     kb_list = [
-        [KeyboardButton(text="📖 О нас"), KeyboardButton(text="👤 Профиль")],
+        [KeyboardButton(text="📖 О проекте"), KeyboardButton(text="👤 Профиль")],
         [KeyboardButton(text="📝 Заполнить анкету"), KeyboardButton(text="📚 Каталог")]
     ]
     if user_telegram_id in admins:

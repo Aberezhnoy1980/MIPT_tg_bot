@@ -68,9 +68,9 @@ async def add_stock_price(message: Message, state: FSMContext):
         stock_exists = await check_stock_existence(message.text)
         if stock_exists:
             await message.answer('Введите стоимость единицы ценной бумаги')
-            async with state.storage.set_data() as data:
-                data['StockID'] = message.text
-            print(data)
+            data = await state.get_data()
+            data['StockID'] = message.text
+            await state.set_data(data)
             await state.set_state(AddStockStates.StockPrice)
         else:
             await message.reply(
@@ -90,6 +90,7 @@ async def add_stock_quantity(message: Message, state: FSMContext):
             await message.answer('Введите количество приобретенных единиц инструмента')
             data = await state.get_data()
             data['StockPrice'] = message.text.replace(',', '.')
+            await state.set_data(data)
             await state.set_state(AddStockStates.StockQuantity)
         except:
             await message.reply('Вы некорректно указали стоимость одной ценной бумаги.')
@@ -109,13 +110,19 @@ async def add_stock_finish(message: Message, state: FSMContext):
             data['StockQuantity'] = message.text
             data['StockOwnerID'] = message.from_user.id
             data['StockPurchaseDate'] = datetime.now()
-            # stock_record = Stock(data['StockOwnerID'], data['StockID'], data['StockPrice'], data['StockQuantity'],
-            #                      data['StockPurchaseDate'])
-            # add_stock(stock_record)
-            print(data)
+            stock_record = Stock(data['StockOwnerID'],
+                                 data['StockID'],
+                                 data['StockQuantity'],
+                                 data['StockPrice'],
+                                 data['StockPurchaseDate'])
+            try:
+                add_stock(stock_record)
+            except Exception as e:
+                print(f"Ошибка при добавлении записи в базу данных: {e}")
+                await message.answer('База не пишет')
             await state.clear()
             await message.answer('Информация о приобретенной ценной бумаге успешно сохранена!')
-        except:
+        except Exception as e:
             await message.reply('Вы некорректно указали количество приобретенных единиц ценной бумаги.')
             await message.answer('Введите количество в виде целого числа или введите /stop для отмены"')
 
@@ -124,13 +131,17 @@ async def add_stock_finish(message: Message, state: FSMContext):
         await message.reply('Добавление информации о приобретенной ценной бумаге отменено')
 
 
-@stock_router.message(Command('checkPortfolioSummary'))
+@stock_router.message(F.text == '/checkPortfolioSummary')
 async def check_portfolio(message: Message):
     user_stocks = get_user_stocks(message.from_user.id)
-    portfolio_price = 0
-    portfolio_stocks_count = 0
+    origin_portfolio_price = 0
+    current_portfolio_price = 0
     for stock in user_stocks:
-        stock_price = int(stock.quantity) * float(stock.unit_price)
-        portfolio_price += stock_price
-        portfolio_stocks_count += 1
-    await message.reply(f'Вы приобрели {portfolio_stocks_count} раз, на общую сумму {portfolio_price} RUB')
+        current_price = await get_stock_price_ru(stock.stock_id)
+        origin_stock_price = int(stock.quantity) * float(stock.unit_price)
+        current_stock_price = int(stock.quantity) * float(current_price[0])
+        origin_portfolio_price += origin_stock_price
+        current_portfolio_price += current_stock_price
+    await message.answer(f'Номинальная стоимость портфеля: {origin_portfolio_price:,.2f} RUB\n'
+                         f'Текущая стоимость портфеля: {current_portfolio_price:,.2f} RUB\n'
+                         f'Прибыль: <b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>')

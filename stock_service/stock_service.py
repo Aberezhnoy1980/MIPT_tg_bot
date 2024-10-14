@@ -8,8 +8,8 @@ from stock_service.stock import Stock
 
 def add_stock(stock):
     with SQLiteDB(config('db_name')) as db:
-        values = (stock.owner_id, stock.stock_id, stock.quantity, stock.unit_price, stock.purchase_date)
-        db.insert_data('stocks', values)
+        values = (stock.stock_id, stock.quantity, stock.unit_price, stock.owner_id, stock.purchase_date)
+        db.insert_data('stocks', *values)
 
 
 async def check_stock_existence(stock_id):
@@ -49,12 +49,12 @@ async def get_stock_price_world(stock_id):
         return []
 
 
-def get_user_stocks(owner_id):
+def get_user_stocks(user_id):
     stocks = []
     with SQLiteDB(config('db_name')) as db:
-        result = db.select_data('stocks', condition=f'owner_id = {owner_id}')
+        result = db.select_data('stocks', condition=f'owner_id = {user_id}')
     for row in result:
-        owner_id, stock_id, quantity, unit_price, purchase_date = row
-        stock = Stock(owner_id, stock_id, quantity, unit_price, purchase_date)
+        stock_id, quantity, unit_price, user_id, purchase_date = row
+        stock = Stock(user_id, stock_id, quantity, unit_price, purchase_date)
         stocks.append(stock)
     return stocks
