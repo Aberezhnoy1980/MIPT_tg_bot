@@ -62,6 +62,8 @@ def get_user_stocks(user_id):
 
 async def calc_portfolio_diff(user_id):
     user_stocks = get_user_stocks(user_id)
+    if not user_stocks:
+        return None
     origin_portfolio_price = 0
     current_portfolio_price = 0
     for stock in user_stocks:

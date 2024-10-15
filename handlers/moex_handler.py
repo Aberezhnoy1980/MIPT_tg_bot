@@ -71,7 +71,6 @@ async def check_stock_id(message: Message, state: FSMContext):
     else:
         await message.reply(
             f"Ценная бумага с идентификатором {stock_id} не найдена ни на Московской бирже, ни на Yahoo! Finance.")
-
     await state.clear()
 
 
@@ -160,32 +159,50 @@ async def add_stock_finish(message: Message, state: FSMContext):
 
 @stock_router.callback_query(F.data == "checkPortfolioSummary")
 async def check_portfolio(callback: CallbackQuery):
-    current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(callback.from_user.id)
-    if current_portfolio_price < origin_portfolio_price:
-        absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
-        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f}</b>'
+    if await calc_portfolio_diff(callback.from_user.id) is None:
+        await callback.message.answer(
+            f'Вы еще не сформировали свой инвестиционный портфель. Вы можете выбрать категорию "Фондовый рынок" и '
+            f'опцию "Добавить"')
     else:
-        absolute_profitability = f'Прибыль: 📈<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
-        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f}</b>'
-    await callback.message.answer(f'Инвестиционный портфель:\n'
-                                  f'Номинальная стоимость: <b>{origin_portfolio_price:,.2f} RUB</b>\n'
-                                  f'Текущая стоимость: <b>{current_portfolio_price:,.2f} RUB</b>\n'
-                                  f'{absolute_profitability} '
-                                  f'{relative_profitability} %')
-    await callback.answer()
+        current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(callback.from_user.id)
+        if current_portfolio_price < origin_portfolio_price:
+            absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+            relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \
+                if origin_portfolio_price != 0 \
+                else ''
+        else:
+            absolute_profitability = f'Прибыль: 📈<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+            relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \
+                if origin_portfolio_price != 0 \
+                else ''
+        await callback.message.answer(f'Инвестиционный портфель:\n'
+                                      f'Номинальная стоимость: <b>{origin_portfolio_price:,.2f} RUB</b>\n'
+                                      f'Текущая стоимость: <b>{current_portfolio_price:,.2f} RUB</b>\n'
+                                      f'{absolute_profitability} '
+                                      f'{relative_profitability}')
+        await callback.answer()
 
 
 @stock_router.message(F.text == '/checkPortfolioSummary')
 async def check_portfolio(message: Message):
-    current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(message.from_user.id)
-    if current_portfolio_price < origin_portfolio_price:
-        absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
-        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1):,.2f}</b>'
+    if await calc_portfolio_diff(message.from_user.id) is None:
+        await message.answer(
+            f'Вы еще не сформировали свой инвестиционный портфель. Вы можете выбрать категорию "Фондовый рынок" и '
+            f'опцию "Добавить"')
     else:
-        absolute_profitability = f'Прибыль: 📈<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
-        relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1):,.2f}</b>'
-    await message.answer(f'Инвестиционный портфель:\n'
-                         f'Номинальная стоимость: <b>{origin_portfolio_price:,.2f} RUB</b>\n'
-                         f'Текущая стоимость: <b>{current_portfolio_price:,.2f} RUB</b>\n'
-                         f'{absolute_profitability} '
-                         f'{relative_profitability} %')
+        current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(message.from_user.id)
+        if current_portfolio_price < origin_portfolio_price:
+            absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+            relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \
+                if origin_portfolio_price != 0 \
+                else ''
+        else:
+            absolute_profitability = f'Прибыль: 📈<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
+            relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \
+                if origin_portfolio_price != 0 \
+                else ''
+        await message.answer(f'Инвестиционный портфель:\n'
+                             f'Номинальная стоимость: <b>{origin_portfolio_price:,.2f} RUB</b>\n'
+                             f'Текущая стоимость: <b>{current_portfolio_price:,.2f} RUB</b>\n'
+                             f'{absolute_profitability} '
+                             f'{relative_profitability}')

@@ -8,7 +8,7 @@ def main_kb(user_telegram_id: int):
     kb_list = [
         [KeyboardButton(text="📖 О проекте"),
          KeyboardButton(text="👤 Профиль")],
-        [KeyboardButton(text="📝 Заполнить анкету"),
+        [KeyboardButton(text="❓ Спросить GPT"),
          KeyboardButton(text="📚 Каталог")]
     ]
     if user_telegram_id in admins:
