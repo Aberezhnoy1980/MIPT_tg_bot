@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 def get_iam_token():
     response = requests.post(
-        config('AIM_TOKEN'),
-        json={'yandexPassportOauthToken': config('OAUTH_TOKEN')}
+        config('YANDEX_AIM_TOKEN'),
+        json={'yandexPassportOauthToken': config('YANDEX_OAUTH_TOKEN')}
     )
     response.raise_for_status()
     return response.json()['iamToken']
@@ -16,7 +16,7 @@ def get_iam_token():
 
 async def send_request(iam_token, user_text):
     data = {
-        "modelUri": f"gpt://{config('FOLDER_ID')}/yandexgpt",
+        "modelUri": f"gpt://{config('YANDEX_CLOUD_FOLDER_ID')}/yandexgpt",
         "completionOptions": {"temperature": 0.3, "maxTokens": 1000},
         "messages": [
             {"role": "system", "text": "отвечу на любые ваши  впоросы!"},
@@ -25,7 +25,7 @@ async def send_request(iam_token, user_text):
     }
     try:
         response = requests.post(
-            config('API_URL'),
+            config('YANDEX_GPT_API_URL'),
             headers={"Accept": "application/json", "Authorization": f"Bearer {iam_token}"},
             json=data
         )

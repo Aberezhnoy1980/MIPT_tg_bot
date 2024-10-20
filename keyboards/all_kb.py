@@ -5,6 +5,11 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 def main_kb(user_telegram_id: int):
+    '''
+    Метод строит кнопки
+    :param user_telegram_id:
+    :return:
+    '''
     kb_list = [
         [KeyboardButton(text="📖 О проекте"),
          KeyboardButton(text="👤 Профиль")],
@@ -28,7 +33,7 @@ def reg_btn():
         text="Пройти регистрацию",
         callback_data="registration")
     )
-    return builder
+    return builder.as_markup()
 
 
 def catalog_kb():
@@ -47,11 +52,11 @@ def catalog_kb():
     return builder
 
 
-def stock_services_kb():
+def securities_services_kb():
     builder = InlineKeyboardBuilder()
-    services = {'Стоимость': '/checkStock',
-                'Добавить': '/addStock',
-                'ИП': 'checkPortfolioSummary'
+    services = {'Стоимость': '/check_stock',
+                'Управление ИП': '/asset_management',
+                'Анализ ИП': '/portfolio_summary'
                 }
     for k, v in services.items():
         builder.add(InlineKeyboardButton(
@@ -59,6 +64,37 @@ def stock_services_kb():
             callback_data=v
         ))
     builder.adjust(3)
+    return builder
+
+
+def portfolio_management_kb():
+    builder = InlineKeyboardBuilder()
+    services = {
+        'Добавить': '/add_asset',
+        'Удалить': '/delete_asset',
+        'Сбросить': '/reset_portfolio',
+        'Анализ': '/portfolio_summary'
+    }
+    for k, v in services.items():
+        builder.add(InlineKeyboardButton(
+            text=k,
+            callback_data=v
+        ))
+    builder.adjust(3)
+    return builder
+
+
+def currency_services_kb():
+    builder = InlineKeyboardBuilder()
+    services = {'Узнать курс': '/check_exchange',
+                'Калькулятор': '/calc_exrate'
+                }
+    for k, v in services.items():
+        builder.add(InlineKeyboardButton(
+            text=k,
+            callback_data=v
+        ))
+    builder.adjust(2)
     return builder
 
 

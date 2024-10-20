@@ -24,6 +24,7 @@ async def process_message(message: Message, state: FSMContext):
 @ygpt_router.message(StateFilter(CheckUserQuestion.user_question))
 async def process_message(message: Message, state: FSMContext):
     user_text = message.text
+
     # Получаем IAM токен
     try:
         iam_token = get_iam_token()

@@ -7,6 +7,7 @@ from aiogram.types import Message
 from aiogram.filters.state import StatesGroup, State, StateFilter
 
 from auth_service.user import User
+from auth_service.user_service import is_user_registered, create_user_record
 
 reg_router = Router()
 
@@ -17,7 +18,7 @@ class CheckUserEmail(StatesGroup):
 
 @reg_router.callback_query(F.data == "registration")
 async def cmd_reg(callback: CallbackQuery, state: FSMContext):
-    if not user_service.is_user_registered(callback.from_user.id):
+    if not is_user_registered(callback.from_user.id):
         await callback.message.answer('Введите ваш email')
         await state.set_state(CheckUserEmail.Email)
     else:
@@ -28,7 +29,7 @@ async def cmd_reg(callback: CallbackQuery, state: FSMContext):
 
 @reg_router.message(F.text == "/reg")
 async def cmd_reg(message: Message, state: FSMContext):
-    if not user_service.is_user_registered(message.from_user.id):
+    if not is_user_registered(message.from_user.id):
         await message.answer('Введите ваш email')
         await state.set_state(CheckUserEmail.Email)
     else:
@@ -36,9 +37,9 @@ async def cmd_reg(message: Message, state: FSMContext):
 
 
 @reg_router.message(StateFilter(CheckUserEmail.Email))
-async def cmd_reg(message: Message, state: FSMContext):
+async def cmd_reg_add_record(message: Message, state: FSMContext):
     new_user = User(message.from_user.id, message.from_user.first_name, message.text)
-    user_service.create_user_record(new_user)
+    create_user_record(new_user)
     await message.answer(f'Регистрация прошла успешно! Привет {message.from_user.first_name}!',
                          reply_markup=main_kb(new_user.telegram_id))
     await state.clear()
