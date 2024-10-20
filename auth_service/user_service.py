@@ -16,6 +16,17 @@ def create_user_record(user: User) -> bool:
     return is_user_registered(user.telegram_id)
 
 
-def get_all_users():
+def get_user_by_id(telegram_id: int) -> User:
+    with SQLiteDB() as db:
+        telegram_id, name, email, ts = db.select_data('users', condition=f'telegram_id = {telegram_id}')[0]
+        return User(telegram_id, name, email)
+
+
+def get_user_count():
     with SQLiteDB() as db:
         return db.select_data('users', aggregation='Count')[0][0]
+
+
+def get_all_users():
+    with SQLiteDB() as db:
+        return db.select_data('users')

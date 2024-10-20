@@ -5,3 +5,4 @@ requests
 asyncio
 pydantic-settings
 yfinance
+faker

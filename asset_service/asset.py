@@ -7,7 +7,7 @@ class Asset:
         self.purchase_date = purchase_date
 
     def __eq__(self, other):
-        if isinstance(self, other):
+        if isinstance(other, Asset):
             return (self.owner_id == other.owner_id
                     and self.asset_id == other.asset_id
                     and self.quantity == other.quantity

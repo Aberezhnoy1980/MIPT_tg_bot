@@ -1,6 +1,6 @@
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from create_bot import bot, admins
-from auth_service.user_service import get_all_users
+from auth_service.user_service import get_user_count
 
 
 async def set_commands():
@@ -27,7 +27,7 @@ async def start_bot():
     :return: Выводит сообщение администраторам бота
     """
     await set_commands()
-    count_users = await get_all_users()
+    count_users = await get_user_count()
     try:
         for admin_id in admins:
             await bot.send_message(admin_id, f'Я запущен🥳. Сейчас в базе данных <b>{count_users}</b> пользователей.')
