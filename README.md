@@ -53,6 +53,8 @@ yfinance
 * сервис взаимодействия с Московской биржей
 * сервис взаимодействия с Центральным банком РФ
 * Подключен YandexGPT
-* Приложение покрыто интеграционными и юнит-тестами
+* Приложение покрыто тестами
+
+![coverage_report](https://github.com/Aberezhnoy1980/MIPT_tg_bot/tree/main/img/coverage_report.png)
 
 В разработке: документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite), CI/CD

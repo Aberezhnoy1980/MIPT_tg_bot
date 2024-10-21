@@ -5,7 +5,6 @@ from asset_service.asset import Asset
 from asset_service.portfolio_service import (is_asset_exists_in_db, is_record_exists_in_db,
                                              add_record, delete_record, reset_portfolio, get_user_assets,
                                              calc_portfolio_diff)
-from asset_service.securities_service import get_stock_price_ru
 from db_handler import SQLiteDB
 
 
