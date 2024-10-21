@@ -55,6 +55,6 @@ yfinance
 * Подключен YandexGPT
 * Приложение покрыто тестами
 
-![coverage_report](https://github.com/Aberezhnoy1980/MIPT_tg_bot/tree/main/img/coverage_report.png)
+![coverage_report](img/coverage_report.png)
 
 В разработке: документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite), CI/CD
