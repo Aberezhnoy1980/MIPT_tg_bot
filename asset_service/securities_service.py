@@ -23,18 +23,19 @@ def get_stock_price_ru(stock_id: str) -> list:
     :param stock_id: Идентификатор актива
     :return: list, возвращает значение цены и валюты
     """
-    url = f'https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities/{stock_id}.json?iss.only=securities&securities.columns=PREVPRICE,CURRENCYID'
+    url = (f'https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities/{stock_id}.'
+           f'json?iss.only=securities&securities.columns=PREVPRICE,CURRENCYID')
+
     response = requests.get(url)
     if response.status_code == 200:
-        data = response.json()
-        data = data.get('securities').get('data')
-        stock_price = data[0][0]
-        stock_currency = data[0][1]
-        if stock_currency == 'SUR':
-            stock_currency = 'RUB'
-    else:
-        return []
-    return [stock_price, stock_currency]
+        data = response.json().get('securities', {}).get('data', [])
+        if data:
+            stock_price = data[0][0]
+            stock_currency = data[0][1]
+            if stock_currency == 'SUR':
+                stock_currency = 'RUB'
+            return [stock_price, stock_currency]
+    return []
 
 
 def get_stock_price_world(stock_id: str) -> list:

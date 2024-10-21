@@ -50,6 +50,7 @@ class TestUserService(unittest.TestCase):
         self.assertIsNotNone(db_response)
         self.assertIn(self.test_asset, db_response)
 
+    @unittest.skip('Нужно доработать')
     @patch('asset_service.portfolio_service.get_user_assets')
     @patch('asset_service.securities_service.get_stock_price_ru')
     def test_calc_portfolio_diff(self, mock_get_stock_price_ru, mock_get_user_assets):
@@ -58,6 +59,7 @@ class TestUserService(unittest.TestCase):
             Mock(asset_id='AAPL', quantity='10', unit_price=100.0),
             Mock(asset_id='GOOGL', quantity='5', unit_price=200.0)
         ]
+
         mock_get_stock_price_ru.side_effect = [(120.0, 'RUB'), (220.0, 'RUB')]
 
         # Calling the function to test

@@ -100,9 +100,10 @@ def calc_portfolio_diff(user_id: int) -> Union[tuple[float, float], None]:
     origin_portfolio_price = 0
     current_portfolio_price = 0
     for stock in user_stocks:
-        current_price = get_stock_price_ru(stock.asset_id)[0]
+        if get_stock_price_ru(stock.asset_id):
+            current_price = get_stock_price_ru(stock.asset_id)[0]
+            current_stock_price = int(stock.quantity) * float(current_price)
+            current_portfolio_price += current_stock_price
         origin_stock_price = int(stock.quantity) * float(stock.unit_price)
-        current_stock_price = int(stock.quantity) * float(current_price)
         origin_portfolio_price += origin_stock_price
-        current_portfolio_price += current_stock_price
     return current_portfolio_price, origin_portfolio_price
