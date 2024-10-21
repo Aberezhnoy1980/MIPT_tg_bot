@@ -27,7 +27,7 @@ async def start_bot():
     :return: Выводит сообщение администраторам бота
     """
     await set_commands()
-    count_users = await get_user_count()
+    count_users = get_user_count()
     try:
         for admin_id in admins:
             await bot.send_message(admin_id, f'Я запущен🥳. Сейчас в базе данных <b>{count_users}</b> пользователей.')

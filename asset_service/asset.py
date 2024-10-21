@@ -15,3 +15,13 @@ class Asset:
                     and self.purchase_date == other.purchase_date
                     )
         return False
+
+    def __hash__(self):
+        return hash((self.asset_id, self.quantity, self.unit_price, self.owner_id))
+
+    def __str__(self):
+        return (f'id: {self.asset_id}, '
+                f'quantity: {self.quantity}, '
+                f'unit_price: {self.unit_price}, '
+                f'owner_id: {self.owner_id}, '
+                f'purchase_date: {self.purchase_date}')

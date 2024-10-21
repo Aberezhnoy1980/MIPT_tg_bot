@@ -44,7 +44,7 @@ async def add_stock_start(callback: CallbackQuery, state: FSMContext):
 @portfolio_router.message(StateFilter(AddAsset.asset_id_response))
 async def add_stock_price(message: Message, state: FSMContext):
     if message.text.lower() != "/stop":
-        stock_exists = await check_stock_existence(message.text)
+        stock_exists = check_stock_existence(message.text)
         if stock_exists:
             await state.update_data(asset_id=message.text.upper())
             await message.answer('Введите стоимость единицы ценной бумаги')
@@ -89,12 +89,11 @@ async def add_stock_finish(message: Message, state: FSMContext):
                               message.from_user.id,
                               datetime.now())
             try:
-                await add_record(new_asset)
+                add_record(new_asset)
             except Exception as e:
                 logger.info(e)
             await message.answer('Информация о приобретенной ценной бумаге успешно сохранена!',
-                                 reply_markup = portfolio_management_kb().as_markup()
-            )
+                                 reply_markup=portfolio_management_kb().as_markup())
             await state.clear()
         except Exception as e:
             logger.info(e)
@@ -123,7 +122,7 @@ async def delete_stock_start(callback: CallbackQuery, state: FSMContext):
 async def delete_asset(message: Message, state: FSMContext):
     if message.text.lower() != "/stop":
         asset_id = message.text.upper()
-        if await is_asset_exists_in_db(asset_id):
+        if is_asset_exists_in_db(asset_id):
             await state.update_data(asset_id=asset_id)
             await message.answer('Введите номинальную стоимость для актива')
             await state.set_state(DeleteAsset.unit_price_response)
@@ -143,7 +142,7 @@ async def delete_asset(message: Message, state: FSMContext):
         unit_price = float(message.text.replace(',', '.'))
         data = await state.get_data()
         asset_id = data['asset_id']
-        if await is_record_exists_in_db(asset_id, unit_price):
+        if is_record_exists_in_db(asset_id, unit_price):
             await state.update_data(asset_id=message.text.upper())
             try:
                 await delete_record(asset_id, unit_price)
@@ -180,10 +179,11 @@ async def delete_stock_start(callback: CallbackQuery, state: FSMContext):
 async def delete_asset(message: Message, state: FSMContext):
     if message.text == 'да'.lower():
         try:
-            await reset_portfolio(message.from_user.id)
+            reset_portfolio(message.from_user.id)
         except Exception as e:
             logger.info(e)
-        await message.answer('Все данные по вашим активам успешно удалены!')
+        await message.answer('Все данные по вашим активам успешно удалены!',
+                             reply_markup=portfolio_management_kb().as_markup())
         await state.clear()
     elif message.text == 'нет'.lower():
         await message.reply('Удаление инвестиционного портфеля отменено',
@@ -195,11 +195,11 @@ async def delete_asset(message: Message, state: FSMContext):
 
 @portfolio_router.callback_query(F.data == "/portfolio_summary")
 async def check_portfolio(callback: CallbackQuery):
-    if await calc_portfolio_diff(callback.from_user.id) is None:
+    if calc_portfolio_diff(callback.from_user.id) is None:
         await callback.message.answer(f'Вы еще не сформировали свой инвестиционный портфель.',
                                       reply_markup=portfolio_management_kb().as_markup())
     else:
-        current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(callback.from_user.id)
+        current_portfolio_price, origin_portfolio_price = calc_portfolio_diff(callback.from_user.id)
         if current_portfolio_price < origin_portfolio_price:
             absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
             relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \
@@ -220,11 +220,11 @@ async def check_portfolio(callback: CallbackQuery):
 
 @portfolio_router.message(F.text == '/portfolio_summary')
 async def check_portfolio(message: Message):
-    if await calc_portfolio_diff(message.from_user.id) is None:
+    if calc_portfolio_diff(message.from_user.id) is None:
         await message.answer(
             f'Вы еще не сформировали свой инвестиционный портфель.', reply_markup=portfolio_management_kb().as_markup())
     else:
-        current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(message.from_user.id)
+        current_portfolio_price, origin_portfolio_price = calc_portfolio_diff(message.from_user.id)
         if current_portfolio_price < origin_portfolio_price:
             absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
             relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \

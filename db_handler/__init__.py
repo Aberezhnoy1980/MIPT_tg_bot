@@ -16,7 +16,6 @@ with SQLiteDB() as db:
                      'quantity INTEGER',
                      'unit_price REAL',
                      'owner_id INTEGER',
-                     'asset_type TEXT',
                      'purchase_date TIMESTAMP',
                      'PRIMARY KEY (asset_id, unit_price, owner_id)',
                      'FOREIGN KEY (owner_id) REFERENCES users(telegram_id) ON DELETE CASCADE']

@@ -41,15 +41,15 @@ async def check_stock_start(callback: CallbackQuery, state: FSMContext):
 async def check_stock_id(message: Message, state: FSMContext):
     stock_id = message.text.upper()
 
-    stock_existence = await check_stock_existence(stock_id)
+    stock_existence = check_stock_existence(stock_id)
     if stock_existence:
-        stock_price, stock_currency = await get_stock_price_ru(stock_id)
+        stock_price, stock_currency = get_stock_price_ru(stock_id)
         if stock_price is not None:
             await message.reply(
                 f"Ценная бумага с идентификатором {stock_id} существует на Московской бирже. "
-                f"Текущий курс: {stock_price}", reply_markup=securities_services_kb().as_markup())
+                f"Текущий курс: {stock_price, stock_currency}", reply_markup=securities_services_kb().as_markup())
         else:
-            stock_price = await get_stock_price_world(stock_id)
+            stock_price = get_stock_price_world(stock_id)
             if stock_price is not None:
                 await message.reply(
                     f"Ценная бумага с идентификатором {stock_id} существует на Yahoo! Finance. "

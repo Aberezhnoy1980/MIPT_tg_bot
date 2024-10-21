@@ -2,19 +2,27 @@ import requests
 import yfinance
 
 
-async def check_stock_existence(stock_id):
+def check_stock_existence(stock_id: str) -> bool:
+    """
+    Функция проверяет существование актива по указанным адресам ресурсов.
+    :param stock_id: Идентификатор актива
+    :return: bool, результат наличия или отсутствия данных в ответе на запрос
+    """
     url = f'https://iss.moex.com/iss/securities/{stock_id}.json'
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        exist = data.get('boards', {}).get('data', [])
-        # return bool(exist) if exist != [] else False
-        return exist != []
+        return data.get('boards', {}).get('data', []) != []
     else:
         return False
 
 
-async def get_stock_price_ru(stock_id):
+def get_stock_price_ru(stock_id: str) -> list:
+    """
+    Функция запрашивает у сервера MOEX цену актива по указанному адресу поп переданному идентификатору
+    :param stock_id: Идентификатор актива
+    :return: list, возвращает значение цены и валюты
+    """
     url = f'https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities/{stock_id}.json?iss.only=securities&securities.columns=PREVPRICE,CURRENCYID'
     response = requests.get(url)
     if response.status_code == 200:
@@ -29,7 +37,12 @@ async def get_stock_price_ru(stock_id):
     return [stock_price, stock_currency]
 
 
-async def get_stock_price_world(stock_id):
+def get_stock_price_world(stock_id: str) -> list:
+    """
+    Функция запрашивает у сервера Yahoo Finance цену актива по указанному адресу поп переданному идентификатору
+    :param stock_id: Идентификатор актива
+    :return: list, возвращает значение цены и валюты
+    """
     ticker = yfinance.Ticker(stock_id)
     stock_info = ticker.info
     stock_currency = stock_info['currency']
