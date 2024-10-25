@@ -106,9 +106,11 @@ alex@iMac-IMAC MIPT_telegram_bot % sudo docker run -d -it \
 --name main_container aberezhnoy1980/mipt-chat-bot
 ```
 
-### CI:
+### CI/CD:
+[![Run Tests](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Tests.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Tests.yml)
 
-Настраиваем
+[![deploy](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml)
+
 Реализованы 
 * сервис авторизации
 * сервис взаимодействия с Московской биржей
