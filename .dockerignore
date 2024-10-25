@@ -1,0 +1,11 @@
+.gitignore
+/app_data
+README.md
+testdraft.py
+polling_logs.txt
+.coverage
+/img
+.env
+/.venv
+/.help
+/__pycache__
