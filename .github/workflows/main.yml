@@ -23,5 +23,6 @@ jobs:
 
     - name: Run tests
       env:
-        API_TOKEN: ${{ secrets.BOT_TOKEN }}
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        BOT_ADMINS: ${{ secrets.BOT_ADMINS }}
       run: python3 -m unittest
