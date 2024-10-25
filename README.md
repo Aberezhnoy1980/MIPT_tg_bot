@@ -106,6 +106,9 @@ alex@iMac-IMAC MIPT_telegram_bot % sudo docker run -d -it \
 --name main_container aberezhnoy1980/mipt-chat-bot
 ```
 
+### CI:
+
+Настраиваем
 Реализованы 
 * сервис авторизации
 * сервис взаимодействия с Московской биржей
