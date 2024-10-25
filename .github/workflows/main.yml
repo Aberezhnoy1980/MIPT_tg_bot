@@ -25,5 +25,5 @@ jobs:
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         BOT_ADMINS: ${{ secrets.BOT_ADMINS }}
-        CBR_URL: ${{ variables.CBR_URL }}
+        CBR_URL: ${{ vars.CBR_URL }}
       run: python3 -m unittest
