@@ -1,4 +1,5 @@
-## Телеграм-бот - финансовый советник
+## Телеграм-бот - [финансовый советник](https://t.me/finassassin_bot)
+https://t.me/finassassin_bot
 <hr>
 aiogram 3.13.1, SQLite3, request, Python 3.9.6
 
