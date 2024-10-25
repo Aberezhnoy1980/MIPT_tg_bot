@@ -24,7 +24,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: malyshkoa2/lesson_5
+        tags: aberezhnoy1980/mipt-chat-bot
         
   deploy:
       name: Deploy the app
@@ -40,7 +40,7 @@ jobs:
           script: |
             sudo docker stop main_container
             sudo docker system prune -a -f
-            sudo docker pull malyshkoa2/lesson_5
+            sudo docker pull aberezhnoy1980/mipt-chat-bot
             sudo nohup docker run -d -it \
             --env-file /home/berezhnoy/.env \
             -v /home/access/app_data:/app/app_data \
