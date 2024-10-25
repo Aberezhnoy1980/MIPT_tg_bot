@@ -1,5 +1,4 @@
 ## Телеграм-бот - [финансовый советник](https://t.me/finassassin_bot)
-https://t.me/finassassin_bot
 <hr>
 aiogram 3.13.1, SQLite3, request, Python 3.9.6
 
@@ -89,19 +88,19 @@ YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 Файлы базы данных и токенов:
 
-`% sudo scp -i /Path/to/.ssh/key_rsa /Path/to/target_file userename@host:/Path/to/dest`
+`~ % sudo scp -i /Path/to/.ssh/key_rsa /Path/to/target_file userename@host:/Path/to/dest`
 
 ### Контейнеризация:
 **Создание образа:**
 
 ```
-alex@iMac-IMAC ~ % sudo docker build --platform linux/amd64 -t aberezhnoy1980/mipt-chat-bot \
-/Users/alex/Documents/Study/Career/MIPT/service_development/telebot/MIPT_telegram_bot
+~ % sudo docker build --platform linux/amd64 -t aberezhnoy1980/mipt-chat-bot \
+/Path/to/project/root
 ```
 **Запуск контейнера:**
 
 ```
-alex@iMac-IMAC MIPT_telegram_bot % sudo docker run -d -it \
+~ % sudo docker run -d -it \
 --env-file /path/to/.env \
 -v /Path/to/localhost/db/directory:/app/app_data \
 --name main_container aberezhnoy1980/mipt-chat-bot
@@ -112,6 +111,7 @@ alex@iMac-IMAC MIPT_telegram_bot % sudo docker run -d -it \
 
 [![deploy](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml)
 
+
 Реализованы 
 * сервис авторизации
 * сервис взаимодействия с Московской биржей
@@ -121,4 +121,4 @@ alex@iMac-IMAC MIPT_telegram_bot % sudo docker run -d -it \
 
 ![coverage_report](img/coverage_report.png)
 
-В разработке: документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite), CI/CD
+В разработке: [презентация](https://github.com/Aberezhnoy1980/MIPT_tg_bot/blob/main/img/Berezhnoy_A_finassassin.pdf) проекта документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite)
