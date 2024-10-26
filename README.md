@@ -7,6 +7,21 @@ aiogram 3.x, SQLite3, request, Python 3.x. Внешние API: MOEX, CBR, Yandex
 начинающие инвесторы, сотрудники финансовых организаций, сэлеры маркетплэйсов,
 предприниматели и аналитики.
 
+### Сервисы и интеграции:
+
+Реализованы 
+* сервис авторизации
+* сервис взаимодействия с Московской биржей
+* сервис взаимодействия с Центральным банком РФ
+* Подключен YandexGPT
+* Приложение покрыто тестами
+
+В разработке: [презентация](https://github.com/Aberezhnoy1980/MIPT_tg_bot/blob/main/img/Berezhnoy_A_finassassin.pdf) 
+проекта документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite)
+
+## Реализация
+<hr>
+
 ### Настройка среды исполнения:
 Настроить виртуальную среду (опционально) для локальной разработки. Создать:
 
@@ -88,11 +103,11 @@ YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 В проекте используется база данных SQLite
 Каталог для данных, БД и таблицы создаются автоматически при запуске приложения (с проверкой `IF EXISTS`)
 
-Для работы приложения из контейнера на удаленный сервер необходимо перенести данные:
-
-Файлы базы данных и токенов:
+Для работы приложения из контейнера на удаленный сервер необходимо перенести файлы базы данных и токенов:
 
 `~ % sudo scp -i /Path/to/.ssh/key_rsa /Path/to/target_file userename@host:/Path/to/dest`
+
+и подмонтировать директорию для хранения данных на удаленном сервере
 
 ### Контейнеризация:
 **Создание образа:**
@@ -111,22 +126,16 @@ YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 ```
 
 ### CI/CD:
-В проекте настроены Actions и Workflows для автоматизации тестирования приложения при слиянии кодовой базы, сборка образа 
-и запуск Docker контейнера на удаленном сервере
 
 [![Run Tests](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Tests.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Tests.yml)
 
 [![deploy](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml)
 
-### Интеграции:
+В проекте настроены Actions и Workflows для автоматизации тестирования приложения при слиянии кодовой базы, сборка образа 
+и запуск Docker контейнера на удаленном сервере:
 
-Реализованы 
-* сервис авторизации
-* сервис взаимодействия с Московской биржей
-* сервис взаимодействия с Центральным банком РФ
-* Подключен YandexGPT
-* Приложение покрыто тестами
+![Run tests](img/CI_teest.png)
 
-![coverage_report](img/coverage_report.png)
+![Deploy](img/CD_deploy1.png)
 
-В разработке: [презентация](https://github.com/Aberezhnoy1980/MIPT_tg_bot/blob/main/img/Berezhnoy_A_finassassin.pdf) проекта документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite)
+![Deploy check](img/CD_deploy2.png)
