@@ -116,6 +116,11 @@ YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 ~ % sudo docker build --platform linux/amd64 -t aberezhnoy1980/mipt-chat-bot \
 /Path/to/project/root
 ```
+Возможная проблема при сборке и публикации образа может быть решена удалением записи `"credsStore": "desktop"` 
+в файле конфигурации:
+
+`nano ~/.docker/config.json`
+
 **Запуск контейнера:**
 
 ```
