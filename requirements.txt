@@ -7,3 +7,4 @@ python-decouple==3.8
 Requests==2.32.3
 yfinance==0.2.44
 packaging
+coverage
