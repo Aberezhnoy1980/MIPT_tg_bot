@@ -1,8 +1,11 @@
 ## Телеграм-бот - [финансовый советник](https://t.me/finassassin_bot)
 <hr>
-aiogram 3.13.1, SQLite3, request, Python 3.9.6
-
-**Разработка бота продолжается**
+aiogram 3.x, SQLite3, request, Python 3.x. Внешние API: MOEX, CBR, YandexGPT
+<hr>
+Бот предоставляет пользователям исторические данные о торгах с бирж и центрального банка,
+пользоваться yandex GPT. Целевая аудитория - все интересующиеся финансами и инвестициями:
+начинающие инвесторы, сотрудники финансовых организаций, сэлеры маркетплэйсов,
+предприниматели и аналитики.
 
 ### Настройка среды исполнения:
 Настроить виртуальную среду (опционально) для локальной разработки. Создать:
@@ -55,7 +58,7 @@ yfinance
 
 `pipreqs . --encoding=iso-8859-1 --ignore ".venv"` 
 
-Для вывода списка зависимостей просто в консоль:
+Для вывода списка зависимостей в консоль:
 
 `pipreqs . --encoding=iso-8859-1 --ignore ".venv" --print`
 
@@ -74,8 +77,9 @@ YANDEX_AIM_TOKEN = 'https://iam.api.cloud.yandex.net/iam/v1/tokens'
 YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 ```
 
-Для считывания переменных окружения можно использовать разные библиотеки. В данном проекте используется 
-`python-decouple`
+Для считывания переменных окружения можно использовать разные библиотеки. Важно помнить, что для успешной работы 
+парсеров, данные значений пар ключ-значение необходимо хранить без кавычек и пробелов вокруг знака "=". В данном проекте используется 
+`python-decouple` для работы с переменными окружения и файлом .env
 
 При запуске контейнера Docker переменные передаются через командную строку в случае использования `dotenv`, 
 или передается path к файлу с переменными в других случаях
@@ -101,16 +105,20 @@ YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 ```
 ~ % sudo docker run -d -it \
---env-file /path/to/.env \
+--env-file /path/to/file \
 -v /Path/to/localhost/db/directory:/app/app_data \
 --name main_container aberezhnoy1980/mipt-chat-bot
 ```
 
 ### CI/CD:
+В проекте настроены Actions и Workflows для автоматизации тестирования приложения при слиянии кодовой базы, сборка образа 
+и запуск Docker контейнера на удаленном сервере
+
 [![Run Tests](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Tests.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Tests.yml)
 
 [![deploy](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml/badge.svg)](https://github.com/Aberezhnoy1980/MIPT_tg_bot/actions/workflows/Deploy_config.yml)
 
+### Интеграции:
 
 Реализованы 
 * сервис авторизации
