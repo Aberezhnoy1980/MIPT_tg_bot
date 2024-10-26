@@ -26,4 +26,6 @@ jobs:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         BOT_ADMINS: ${{ secrets.BOT_ADMINS }}
         CBR_URL: ${{ vars.CBR_URL }}
-      run: python3 -m unittest
+      run: coverage run -m unittest discover
+    - name: report
+      run: coverage report
