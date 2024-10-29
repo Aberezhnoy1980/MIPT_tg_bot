@@ -16,7 +16,8 @@ async def set_commands():
         BotCommand(command='delete_asset', description='Удавление актива из портфеля'),
         BotCommand(command='reset_portfolio', description='Сброс портфеля'),
         BotCommand(command='check_stock', description='Получение текущей котировки акции'),
-        BotCommand(command='check_exchange', description='Получение текущей котировки валюты')
+        BotCommand(command='check_exchange', description='Получение текущей котировки валюты'),
+        BotCommand(command='portfolio_summary', description='Анализ разницы номинальной и текущей стоимости портфеля')
     ]
     await bot.set_my_commands(commands, BotCommandScopeDefault())
 
