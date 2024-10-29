@@ -43,6 +43,6 @@ jobs:
             sudo docker pull aberezhnoy1980/mipt-chat-bot
             sudo nohup docker run -d -it \
             --env-file /home/berezhnoy/.env \
-            -v /home/access/app_data:/app/app_data \
+            -v /home/berezhnoy/app_data:/app/app_data \
             --name main_container \
             aberezhnoy1980/mipt-chat-bot
