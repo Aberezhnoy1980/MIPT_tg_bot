@@ -46,20 +46,20 @@ async def check_stock_id(message: Message, state: FSMContext):
         stock_price, stock_currency = get_stock_price_ru(stock_id)
         if stock_price is not None:
             await message.reply(
-                f"Ценная бумага с идентификатором {stock_id} существует на Московской бирже. "
+                f"Ценная бумага с идентификатором {stock_id} торгуется на Московской бирже. "
                 f"Текущий курс: {stock_price, stock_currency}", reply_markup=securities_services_kb().as_markup())
         else:
             stock_price = get_stock_price_world(stock_id)
             if stock_price is not None:
                 await message.reply(
-                    f"Ценная бумага с идентификатором {stock_id} существует на Yahoo! Finance. "
+                    f"Ценная бумага с идентификатором {stock_id} торгуется на международных площадках. "
                     f"Текущий курс: {stock_price}", reply_markup=securities_services_kb().as_markup())
             else:
                 await message.reply(
-                    f"Ценная бумага с идентификатором {stock_id} существует на Московской бирже, но не продается ни в "
-                    f"России, ни за рубежом", reply_markup=securities_services_kb().as_markup())
+                    f"Ценная бумага с идентификатором {stock_id} зарегистрирована на Московской бирже, но не "
+                    f"торгуется ни в России, ни за рубежом", reply_markup=securities_services_kb().as_markup())
     else:
         await message.reply(
-            f"Ценная бумага с идентификатором {stock_id} не найдена ни на Московской бирже, ни на Yahoo! Finance.",
+            f"Тикер {stock_id} не найден ни на Московской бирже, ни на Yahoo! Finance.",
             reply_markup=securities_services_kb().as_markup())
     await state.clear()

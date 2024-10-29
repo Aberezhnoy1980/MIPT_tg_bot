@@ -4,6 +4,8 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State, StateFilter
+
+from keyboards.all_kb import main_kb
 from ygpt_service.ygpt_service import get_iam_token, send_request
 
 ygpt_router = Router()
@@ -35,5 +37,5 @@ async def process_message(message: Message, state: FSMContext):
         return
 
     # Отправляем запрос к Yandex GPT
-    await message.answer(await send_request(iam_token, user_text))
+    await message.answer(await send_request(iam_token, user_text), reply_markup=main_kb(message.from_user.id))
     await state.clear()
