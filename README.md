@@ -9,12 +9,24 @@ aiogram 3.x, SQLite3, request, Python 3.x. Внешние API: MOEX, CBR, Yandex
 
 ### Сервисы и интеграции:
 
-Реализованы 
+**Реализованы:** 
 * сервис авторизации
-* сервис взаимодействия с Московской биржей
-* сервис взаимодействия с Центральным банком РФ
-* Подключен YandexGPT
-* Приложение покрыто тестами
+* сервис взаимодействия управления ценными бумагами
+* сервис управления валютой
+* сервис база знаний в виде YandexGPT
+
+**Интегрированы API:**
+* MOEX
+* CBR
+* YandexGPT
+
+### Сценарии взаимодействия:
+
+1. Авторизация
+
+![авторизация](img/auth.png)
+
+2. Получение стоимости бумаги
 
 В разработке: [презентация](https://github.com/Aberezhnoy1980/MIPT_tg_bot/blob/main/img/Berezhnoy_A_finassassin.pdf) 
 проекта документирование проекта, перевод приложения с polling на webhooks, подключение ORM (SQLAlchemy, aiosqlite)
@@ -25,21 +37,16 @@ aiogram 3.x, SQLite3, request, Python 3.x. Внешние API: MOEX, CBR, Yandex
 ### Настройка среды исполнения:
 Настроить виртуальную среду (опционально) для локальной разработки. Создать:
 
-`python -m venv .venv`
-
+```shell
+python -m venv .venv
+```
 и активировать:
 
-`
-venv\Scripts\activate.bat` для Windows
+`venv\Scripts\activate.bat` для Windows
 
 `source venv/bin/activate` - для Linux и MacOS.
 
-(Деактивировать:
-
-`
-venv\Scripts\deactivate` для Windows
-
-`deactivate` - для Linux и MacOS.
+(Деактивировать: `venv\Scripts\deactivate` для Windows, `deactivate` - для Linux и MacOS.
 )
 
 Также среду и версию интерпретатора можно настроить с помощью настроек проекта в IDE
@@ -47,7 +54,9 @@ venv\Scripts\deactivate` для Windows
 ### Зависимости:
 Установить зависимости можно с помощью файла requirements.txt. Локально установить зависимости можно с помощью:
 
-`pip3 install -r requirements.txt`
+```shell
+pip3 install -r requirements.txt
+````
 
 Файл requirements.txt может иметь следующий вид:
 
@@ -105,25 +114,29 @@ YGPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 Для работы приложения из контейнера на удаленный сервер необходимо перенести файлы базы данных и токенов:
 
-`~ % sudo scp -i /Path/to/.ssh/key_rsa /Path/to/target_file userename@host:/Path/to/dest`
+```shell
+~ % sudo scp -i /Path/to/.ssh/key_rsa /Path/to/target_file userename@host:/Path/to/dest
+```
 
 и подмонтировать директорию для хранения данных на удаленном сервере
 
 ### Контейнеризация:
 **Создание образа:**
 
-```
+```shell
 ~ % sudo docker build --platform linux/amd64 -t aberezhnoy1980/mipt-chat-bot \
 /Path/to/project/root
 ```
 Возможная проблема при сборке и публикации образа может быть решена удалением записи `"credsStore": "desktop"` 
 в файле конфигурации:
 
-`nano ~/.docker/config.json`
+```shell
+nano ~/.docker/config.json
+```
 
 **Запуск контейнера:**
 
-```
+```shell
 ~ % sudo docker run -d -it \
 --env-file /path/to/file \
 -v /Path/to/localhost/db/directory:/app/app_data \
