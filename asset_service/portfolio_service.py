@@ -1,5 +1,6 @@
 from typing import Union
 
+from asset_service.currency_service import get_exchange_rate
 from db_handler import SQLiteDB
 from asset_service.asset import Asset
 from asset_service.securities_service import get_stock_price_ru
@@ -88,7 +89,7 @@ def get_user_assets(user_id: int) -> list:
     return assets
 
 
-def calc_portfolio_diff(user_id: int) -> Union[tuple[float, float], None]:
+async def calc_portfolio_diff(user_id: int) -> Union[tuple[float, float], None]:
     """
     Функция для анализа отклонения текущей стоимости портфеля от номинальной.
     :param user_id:
@@ -103,6 +104,10 @@ def calc_portfolio_diff(user_id: int) -> Union[tuple[float, float], None]:
         if get_stock_price_ru(stock.asset_id):
             current_price = get_stock_price_ru(stock.asset_id)[0]
             current_stock_price = int(stock.quantity) * float(current_price)
+            current_portfolio_price += current_stock_price
+        elif await get_exchange_rate(stock.asset_id):
+            current_price = await get_exchange_rate(stock.asset_id)
+            current_stock_price = int(stock.quantity) * float(current_price.replace(',', '.'))
             current_portfolio_price += current_stock_price
         origin_stock_price = int(stock.quantity) * float(stock.unit_price)
         origin_portfolio_price += origin_stock_price

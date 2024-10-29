@@ -87,7 +87,9 @@ def portfolio_management_kb():
 def currency_services_kb():
     builder = InlineKeyboardBuilder()
     services = {'Узнать курс': '/check_exchange',
-                'Калькулятор': '/calc_exrate'
+                'Калькулятор': '/calc_exrate',
+                'Управление ИП': '/asset_management',
+                'Анализ ИП': '/portfolio_summary'
                 }
     for k, v in services.items():
         builder.add(InlineKeyboardButton(

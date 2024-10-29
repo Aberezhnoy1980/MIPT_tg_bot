@@ -7,6 +7,7 @@ from aiogram.filters.state import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
+from asset_service.currency_service import get_exchange_rate
 from keyboards.all_kb import portfolio_management_kb
 from asset_service.asset import Asset
 from asset_service.securities_service import check_stock_existence
@@ -36,7 +37,7 @@ async def add_stock_start(message: Message, state: FSMContext):
 
 @portfolio_router.callback_query(F.data == "/add_asset")
 async def add_stock_start(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer('Введите идентификатор приобретенного инструмента')
+    await callback.message.answer('Введите идентификатор приобретенного актива')
     await state.set_state(AddAsset.asset_id_response)
     await callback.answer()
 
@@ -44,18 +45,19 @@ async def add_stock_start(callback: CallbackQuery, state: FSMContext):
 @portfolio_router.message(StateFilter(AddAsset.asset_id_response))
 async def add_stock_price(message: Message, state: FSMContext):
     if message.text.lower() != "/stop":
-        stock_exists = check_stock_existence(message.text)
-        if stock_exists:
+        asset = message.text
+        # TODO currency_exist = await get_exchange_rate(asset)
+        if check_stock_existence(asset) or get_exchange_rate(asset):
             await state.update_data(asset_id=message.text.upper())
-            await message.answer('Введите стоимость единицы ценной бумаги')
+            await message.answer('Введите стоимость единицы актива')
             await state.set_state(AddAsset.unit_price_response)
         else:
             await message.reply(
-                'Указанный идентификатор ценной бумаги не найден ни на Московской бирже, ни на Yahoo! Finance.')
+                'Указанный идентификатор актива не найден на Московской бирже, Yahoo! Finance или Центральном банке.')
             await message.answer('Введите корректный идентификатор приобретенного инструмента или введите /stop для '
                                  'отмены')
     else:
-        await message.reply('Добавление информации о приобретенной ценной бумаге отменено',
+        await message.reply('Добавление информации о приобретенном активе отменено',
                             reply_markup=portfolio_management_kb().as_markup())
         await state.clear()
 
@@ -69,10 +71,10 @@ async def add_stock_quantity(message: Message, state: FSMContext):
             await state.set_state(AddAsset.quantity_response)
         except Exception as e:
             logger.info(e)
-            await message.reply('Вы некорректно указали стоимость одной ценной бумаги.')
+            await message.reply('Вы некорректно указали стоимость актива.')
             await message.answer('Введите стоимость приобретения в числовом формате или введите /stop для отмены"')
     else:
-        await message.reply('Добавление информации о приобретенной ценной бумаге отменено',
+        await message.reply('Добавление информации о приобретенном активе отменено',
                             reply_markup=portfolio_management_kb().as_markup())
         await state.clear()
 
@@ -92,15 +94,15 @@ async def add_stock_finish(message: Message, state: FSMContext):
                 add_record(new_asset)
             except Exception as e:
                 logger.info(e)
-            await message.answer('Информация о приобретенной ценной бумаге успешно сохранена!',
+            await message.answer('Информация о приобретенном активе успешно сохранена!',
                                  reply_markup=portfolio_management_kb().as_markup())
             await state.clear()
         except Exception as e:
             logger.info(e)
-            await message.reply('Вы некорректно указали количество приобретенных единиц ценной бумаги.')
+            await message.reply('Вы некорректно указали количество.')
             await message.answer('Введите количество в виде целого числа или введите /stop для отмены')
     else:
-        await message.reply('Добавление информации о приобретенной ценной бумаге отменено',
+        await message.reply('Добавление информации о приобретенном активе отменено',
                             reply_markup=portfolio_management_kb().as_markup())
         await state.clear()
 
@@ -145,7 +147,7 @@ async def delete_asset(message: Message, state: FSMContext):
         if is_record_exists_in_db(asset_id, unit_price):
             await state.update_data(asset_id=message.text.upper())
             try:
-                await delete_record(asset_id, unit_price)
+                delete_record(asset_id, unit_price)
             except Exception as e:
                 logger.info(e)
             await message.answer('Информация о приобретенной ценной бумаге успешно удалена!',
@@ -195,11 +197,11 @@ async def delete_asset(message: Message, state: FSMContext):
 
 @portfolio_router.callback_query(F.data == "/portfolio_summary")
 async def check_portfolio(callback: CallbackQuery):
-    if calc_portfolio_diff(callback.from_user.id) is None:
+    if await calc_portfolio_diff(callback.from_user.id) is None:
         await callback.message.answer(f'Вы еще не сформировали свой инвестиционный портфель.',
                                       reply_markup=portfolio_management_kb().as_markup())
     else:
-        current_portfolio_price, origin_portfolio_price = calc_portfolio_diff(callback.from_user.id)
+        current_portfolio_price, origin_portfolio_price = await calc_portfolio_diff(callback.from_user.id)
         if current_portfolio_price < origin_portfolio_price:
             absolute_profitability = f'Прибыль: 📉<b>{(current_portfolio_price - origin_portfolio_price):,.2f}</b>'
             relative_profitability = f'или <b>{(current_portfolio_price / origin_portfolio_price - 1) * 100:,.2f} %</b>' \
@@ -220,7 +222,7 @@ async def check_portfolio(callback: CallbackQuery):
 
 @portfolio_router.message(F.text == '/portfolio_summary')
 async def check_portfolio(message: Message):
-    if calc_portfolio_diff(message.from_user.id) is None:
+    if await calc_portfolio_diff(message.from_user.id) is None:
         await message.answer(
             f'Вы еще не сформировали свой инвестиционный портфель.', reply_markup=portfolio_management_kb().as_markup())
     else:
